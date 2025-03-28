@@ -1,32 +1,64 @@
 package internal
 
 import (
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/goexl/id"
-	"github.com/kkrypt0nn/spaceflake"
 )
 
-var _ id.Id = (*Id)(nil)
+var _ id.Value = (*Id)(nil)
 
 type Id struct {
-	value *spaceflake.Spaceflake
+	value uint64
+	time  time.Time
 }
 
-func NewId(value *spaceflake.Spaceflake) *Id {
+func NewId(value uint64, time time.Time) *Id {
 	return &Id{
 		value: value,
+		time:  time,
 	}
 }
 
 func (i *Id) String() string {
-	return i.value.StringID()
+	return strconv.FormatUint(i.value, 10)
 }
 
 func (i *Id) Time() time.Time {
-	return time.UnixMilli(int64(i.value.Time()))
+	return i.time
 }
 
-func (i *Id) Value() uint64 {
-	return i.value.ID()
+func (i *Id) Get() uint64 {
+	return i.value
+}
+
+func (i *Id) MarshalJSON() ([]byte, error) {
+	return []byte(strconv.FormatUint(i.Get(), 10)), nil
+}
+
+func (i *Id) UnmarshalJSON(from []byte) (err error) {
+	converted := strings.Trim(string(from), `"`) // 去除字符串的引号
+	if value, pue := strconv.ParseUint(converted, 10, 64); nil != pue {
+		err = pue
+	} else {
+		(*i).value = value
+	}
+
+	return
+}
+
+func (i *Id) FromDB(from []byte) (err error) {
+	if parsed, pue := strconv.ParseUint(string(from), 10, 64); nil != pue {
+		err = pue
+	} else {
+		(*i).value = parsed
+	}
+
+	return
+}
+
+func (i *Id) ToDB() ([]byte, error) {
+	return []byte(strconv.FormatUint(i.value, 10)), nil
 }
