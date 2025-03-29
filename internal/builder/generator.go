@@ -18,7 +18,7 @@ func NewGenerator() *Generator {
 }
 
 func (g *Generator) Start(time time.Time) (snowflake *Generator) {
-	g.config.Start = time
+	g.config.Epoch = time
 	snowflake = g
 
 	return

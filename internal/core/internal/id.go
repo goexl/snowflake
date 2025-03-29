@@ -2,10 +2,11 @@ package internal
 
 import (
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/goexl/id"
+	"github.com/goexl/snowflake/internal/internal/param"
+	"github.com/kkrypt0nn/spaceflake"
 )
 
 var _ id.Value = (*Id)(nil)
@@ -31,29 +32,22 @@ func (i *Id) Time() time.Time {
 }
 
 func (i *Id) Get() uint64 {
-	return i.value
+	return i.value - param.NewGenerator().Start
 }
 
 func (i *Id) MarshalJSON() ([]byte, error) {
-	return []byte(strconv.FormatUint(i.Get(), 10)), nil
+	return i.ToDB()
 }
 
-func (i *Id) UnmarshalJSON(from []byte) (err error) {
-	converted := strings.Trim(string(from), `"`) // 去除字符串的引号
-	if value, pue := strconv.ParseUint(converted, 10, 64); nil != pue {
-		err = pue
-	} else {
-		(*i).value = value
-	}
-
-	return
+func (i *Id) UnmarshalJSON(from []byte) error {
+	return i.FromDB(from)
 }
 
 func (i *Id) FromDB(from []byte) (err error) {
 	if parsed, pue := strconv.ParseUint(string(from), 10, 64); nil != pue {
 		err = pue
 	} else {
-		(*i).value = parsed
+		i.from(parsed)
 	}
 
 	return
@@ -61,4 +55,10 @@ func (i *Id) FromDB(from []byte) (err error) {
 
 func (i *Id) ToDB() ([]byte, error) {
 	return []byte(strconv.FormatUint(i.value, 10)), nil
+}
+
+func (i *Id) from(value uint64) {
+	config := param.NewGenerator()
+	(*i).time = time.UnixMilli(int64(spaceflake.ParseTime(value, uint64(config.Epoch.UnixMilli()))))
+	(*i).value = value
 }

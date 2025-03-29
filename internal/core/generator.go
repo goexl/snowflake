@@ -16,22 +16,8 @@ type Generator struct {
 }
 
 func NewGenerator(config *param.Generator) *Generator {
-	settings := new(spaceflake.GeneratorSettings)
-	if !config.Start.IsZero() {
-		settings.BaseEpoch = uint64(config.Start.Unix())
-	}
-	if 0 != config.Node {
-		settings.NodeID = config.Node
-	}
-	if 0 != config.Worker {
-		settings.WorkerID = config.Worker
-	}
-	if 0 != config.Sequence {
-		settings.Sequence = config.Sequence
-	}
-
 	return &Generator{
-		settings: settings,
+		settings: config.Settings(),
 	}
 }
 
