@@ -32,7 +32,7 @@ func (i *Id) Time() time.Time {
 }
 
 func (i *Id) Get() uint64 {
-	return i.value - param.NewGenerator().Start
+	return i.value - param.NewGenerator().Skip
 }
 
 func (i *Id) MarshalJSON() ([]byte, error) {

@@ -24,8 +24,8 @@ func (g *Generator) Epoch(epoch time.Time) (snowflake *Generator) {
 	return
 }
 
-func (g *Generator) Start(start uint64) (snowflake *Generator) {
-	g.config.Start = start
+func (g *Generator) Skip(skip uint64) (snowflake *Generator) {
+	g.config.Skip = skip
 	snowflake = g
 
 	return

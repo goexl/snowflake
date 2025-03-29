@@ -13,7 +13,7 @@ var (
 )
 
 type Generator struct {
-	Start    uint64
+	Skip     uint64
 	Epoch    time.Time
 	Node     uint64
 	Worker   uint64
