@@ -30,3 +30,7 @@ func (s *Generator) Next() (value id.Value, err error) {
 
 	return
 }
+
+func (s *Generator) Parse(from uint64) id.Value {
+	return internal.Parse(from)
+}

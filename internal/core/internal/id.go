@@ -23,6 +23,13 @@ func NewId(value uint64, time time.Time) *Id {
 	}
 }
 
+func Parse(from uint64) *Id {
+	return &Id{
+		value: from,
+		time:  time.UnixMilli(int64(spaceflake.ParseTime(from, uint64(param.NewGenerator().Epoch.UnixMilli())))),
+	}
+}
+
 func (i *Id) String() string {
 	return strconv.FormatUint(i.value, 10)
 }
