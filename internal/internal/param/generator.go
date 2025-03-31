@@ -36,7 +36,7 @@ func NewGenerator() *Generator {
 func (g *Generator) Settings() (settings *spaceflake.GeneratorSettings) {
 	settings = new(spaceflake.GeneratorSettings)
 	if !g.Epoch.IsZero() {
-		settings.BaseEpoch = uint64(g.Epoch.Unix())
+		settings.BaseEpoch = uint64(g.Epoch.UnixMilli())
 	}
 	if 0 != g.Node {
 		settings.NodeID = g.Node

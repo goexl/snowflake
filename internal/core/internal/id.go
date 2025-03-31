@@ -23,11 +23,12 @@ func NewId(value uint64, time time.Time) *Id {
 	}
 }
 
-func Parse(from uint64) *Id {
-	return &Id{
-		value: from,
-		time:  time.UnixMilli(int64(spaceflake.ParseTime(from, uint64(param.NewGenerator().Epoch.UnixMilli())))),
-	}
+func Parse(from uint64) (id *Id) {
+	id = new(Id)
+	id.value = from
+	id.parseTime()
+
+	return
 }
 
 func (i *Id) String() string {
@@ -65,7 +66,15 @@ func (i *Id) ToDB() ([]byte, error) {
 }
 
 func (i *Id) from(value uint64) {
-	config := param.NewGenerator()
-	(*i).time = time.UnixMilli(int64(spaceflake.ParseTime(value, uint64(config.Epoch.UnixMilli()))))
 	(*i).value = value
+	i.parseTime()
+}
+
+func (i *Id) parseTime() {
+	base := uint64(0)
+	epoch := param.NewGenerator().Epoch
+	if !epoch.IsZero() {
+		base = uint64(epoch.UnixMilli())
+	}
+	(*i).time = time.UnixMilli(int64(spaceflake.ParseTime(i.value, base)))
 }
