@@ -72,7 +72,7 @@ func (i *Id) from(value uint64) {
 
 func (i *Id) parseTime() {
 	base := uint64(0)
-	epoch := param.NewGenerator().Epoch
+	epoch := param.NewGenerator().Base
 	if !epoch.IsZero() {
 		base = uint64(epoch.UnixMilli())
 	}
