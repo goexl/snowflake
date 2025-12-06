@@ -14,7 +14,7 @@ var (
 
 type Generator struct {
 	Skip     uint64
-	Base     time.Time
+	Epoch    time.Time
 	Node     uint64
 	Worker   uint64
 	Sequence uint64
@@ -35,8 +35,8 @@ func NewGenerator() *Generator {
 
 func (g *Generator) Settings() (settings *spaceflake.GeneratorSettings) {
 	settings = new(spaceflake.GeneratorSettings)
-	if !g.Base.IsZero() {
-		settings.BaseEpoch = uint64(g.Base.UnixMilli())
+	if !g.Epoch.IsZero() {
+		settings.BaseEpoch = uint64(g.Epoch.UnixMilli())
 	}
 	if 0 != g.Node {
 		settings.NodeID = g.Node
