@@ -24,7 +24,7 @@ func (g *Generator) Started(time time.Time) (generator *Generator) {
 	return
 }
 
-func (g *Generator) Machine(machine uint16) (generator *Generator) {
+func (g *Generator) Machine(machine uint32) (generator *Generator) {
 	g.config.Machine = machine
 	generator = g
 

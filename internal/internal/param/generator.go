@@ -14,7 +14,7 @@ var (
 
 type Generator struct {
 	Started  time.Time
-	Machine  uint16
+	Machine  uint32
 	Machines int
 }
 
@@ -42,7 +42,7 @@ func (g *Generator) Settings() (settings *sonyflake.Settings) {
 		return int(g.Machine), nil
 	}
 	settings.CheckMachineID = func(id int) bool {
-		return id <= 2<<g.Machines
+		return id <= 2<<31
 	}
 
 	return
