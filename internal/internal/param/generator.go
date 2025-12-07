@@ -13,7 +13,6 @@ var (
 )
 
 type Generator struct {
-	Skip     uint64
 	Started  time.Time
 	Node     uint16
 	Worker   uint16
@@ -24,7 +23,7 @@ func NewGenerator() *Generator {
 	once.Do(func() { // 使用单例模式保证只有一份配置
 		if nil == generator {
 			generator = &Generator{
-				Started:  time.Date(2025, time.December, 7, 9, 0, 0, 0, time.UTC),
+				Started:  time.Date(2025, time.December, 7, 12, 35, 30, 30, time.UTC),
 				Node:     1,
 				Worker:   1,
 				Machines: 16,

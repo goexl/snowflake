@@ -24,13 +24,6 @@ func (g *Generator) Started(time time.Time) (snowflake *Generator) {
 	return
 }
 
-func (g *Generator) Skip(skip uint64) (snowflake *Generator) {
-	g.config.Skip = skip
-	snowflake = g
-
-	return
-}
-
 func (g *Generator) Node(node uint16) (snowflake *Generator) {
 	g.config.Node = node
 	snowflake = g

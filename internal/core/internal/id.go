@@ -40,7 +40,7 @@ func (i *Id) Time() time.Time {
 }
 
 func (i *Id) Get() uint64 {
-	return i.value - param.NewGenerator().Skip
+	return i.value
 }
 
 func (i *Id) MarshalJSON() ([]byte, error) {
