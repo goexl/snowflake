@@ -5,6 +5,7 @@ go 1.24
 require (
 	github.com/goexl/id v0.1.3
 	github.com/kkrypt0nn/spaceflake v1.6.0
+	github.com/sony/sonyflake/v2 v2.2.0
 	github.com/stretchr/testify v1.11.1
 )
 

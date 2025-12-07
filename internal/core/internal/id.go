@@ -6,27 +6,27 @@ import (
 
 	"github.com/goexl/id"
 	"github.com/goexl/snowflake/internal/internal/param"
-	"github.com/kkrypt0nn/spaceflake"
+	"github.com/sony/sonyflake/v2"
 )
 
 var _ id.Value = (*Id)(nil)
 
 type Id struct {
 	value uint64
-	time  time.Time
+	flake *sonyflake.Sonyflake
 }
 
-func NewId(value uint64, time time.Time) *Id {
+func NewId(value uint64, flake *sonyflake.Sonyflake) *Id {
 	return &Id{
 		value: value,
-		time:  time,
+		flake: flake,
 	}
 }
 
 func Parse(from uint64) (id *Id) {
 	id = new(Id)
 	id.value = from
-	id.parseTime()
+	id.parseFlake()
 
 	return
 }
@@ -36,11 +36,11 @@ func (i *Id) String() string {
 }
 
 func (i *Id) Time() time.Time {
-	return i.time
+	return i.flake.ToTime(int64(i.value))
 }
 
 func (i *Id) Get() uint64 {
-	return i.value - param.NewGenerator().Skip
+	return i.value
 }
 
 func (i *Id) MarshalJSON() ([]byte, error) {
@@ -67,14 +67,18 @@ func (i *Id) ToDB() ([]byte, error) {
 
 func (i *Id) from(value uint64) {
 	(*i).value = value
-	i.parseTime()
+	i.parseFlake()
 }
 
-func (i *Id) parseTime() {
-	base := uint64(0)
-	epoch := param.NewGenerator().Epoch
-	if !epoch.IsZero() {
-		base = uint64(epoch.UnixMilli())
+func (i *Id) parseFlake() {
+	settings := new(sonyflake.Settings)
+	started := param.NewGenerator().Started
+	if !started.IsZero() {
+		settings.StartTime = started
 	}
-	(*i).time = time.UnixMilli(int64(spaceflake.ParseTime(i.value, base)))
+	if flake, err := sonyflake.New(*settings); nil != err {
+		panic(err)
+	} else {
+		(*i).flake = flake
+	}
 }
