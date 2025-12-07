@@ -17,23 +17,16 @@ func NewGenerator() *Generator {
 	}
 }
 
-func (g *Generator) Started(time time.Time) (snowflake *Generator) {
+func (g *Generator) Started(time time.Time) (generator *Generator) {
 	g.config.Started = time
-	snowflake = g
+	generator = g
 
 	return
 }
 
-func (g *Generator) Node(node uint16) (snowflake *Generator) {
-	g.config.Node = node
-	snowflake = g
-
-	return
-}
-
-func (g *Generator) Worker(worker uint16) (snowflake *Generator) {
-	g.config.Worker = worker
-	snowflake = g
+func (g *Generator) Machine(machine uint16) (generator *Generator) {
+	g.config.Machine = machine
+	generator = g
 
 	return
 }
