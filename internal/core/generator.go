@@ -1,18 +1,17 @@
 package core
 
 import (
-	"time"
-
 	"github.com/goexl/id"
 	"github.com/goexl/snowflake/internal/core/internal"
 	"github.com/goexl/snowflake/internal/internal/param"
-	"github.com/kkrypt0nn/spaceflake"
+	"github.com/sony/sonyflake/v2"
 )
 
 var _ id.Generator = (*Generator)(nil)
 
 type Generator struct {
-	settings *spaceflake.GeneratorSettings
+	settings *sonyflake.Settings
+	flake    *sonyflake.Sonyflake
 }
 
 func NewGenerator(config *param.Generator) *Generator {
@@ -21,16 +20,26 @@ func NewGenerator(config *param.Generator) *Generator {
 	}
 }
 
-func (s *Generator) Next() (value id.Value, err error) {
-	if next, ge := spaceflake.Generate(*s.settings); nil != ge {
+func (g *Generator) Next() (value id.Value, err error) {
+	if ie := g.init(); nil != ie {
+		err = ie
+	} else if next, ge := g.flake.NextID(); nil != ge {
 		err = ge
 	} else {
-		value = internal.NewId(next.ID(), time.UnixMilli(int64(next.Time())))
+		value = internal.NewId(uint64(next), g.flake)
 	}
 
 	return
 }
 
-func (s *Generator) Parse(from uint64) id.Value {
+func (g *Generator) Parse(from uint64) id.Value {
 	return internal.Parse(from)
+}
+
+func (g *Generator) init() (err error) {
+	if nil == g.flake {
+		g.flake, err = sonyflake.New(*g.settings)
+	}
+
+	return
 }

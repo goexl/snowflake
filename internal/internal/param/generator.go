@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kkrypt0nn/spaceflake"
+	"github.com/sony/sonyflake/v2"
 )
 
 var (
@@ -14,18 +14,20 @@ var (
 
 type Generator struct {
 	Skip     uint64
-	Epoch    time.Time
-	Node     uint64
-	Worker   uint64
-	Sequence uint64
+	Started  time.Time
+	Node     uint16
+	Worker   uint16
+	Machines int
 }
 
 func NewGenerator() *Generator {
 	once.Do(func() { // 使用单例模式保证只有一份配置
 		if nil == generator {
 			generator = &Generator{
-				Node:   1,
-				Worker: 1,
+				Started:  time.Date(2025, time.December, 7, 9, 0, 0, 0, time.UTC),
+				Node:     1,
+				Worker:   1,
+				Machines: 16,
 			}
 		}
 	})
@@ -33,19 +35,17 @@ func NewGenerator() *Generator {
 	return generator
 }
 
-func (g *Generator) Settings() (settings *spaceflake.GeneratorSettings) {
-	settings = new(spaceflake.GeneratorSettings)
-	if !g.Epoch.IsZero() {
-		settings.BaseEpoch = uint64(g.Epoch.UnixMilli())
+func (g *Generator) Settings() (settings *sonyflake.Settings) {
+	settings = new(sonyflake.Settings)
+	if !g.Started.IsZero() {
+		settings.StartTime = g.Started
 	}
-	if 0 != g.Node {
-		settings.NodeID = g.Node
+	settings.BitsMachineID = g.Machines
+	settings.MachineID = func() (int, error) {
+		return int(g.Node) * int(g.Worker), nil
 	}
-	if 0 != g.Worker {
-		settings.WorkerID = g.Worker
-	}
-	if 0 != g.Sequence {
-		settings.Sequence = g.Sequence
+	settings.CheckMachineID = func(id int) bool {
+		return id <= 2<<g.Machines
 	}
 
 	return
